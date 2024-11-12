@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="ru"><head>
+    <title>durkach</title>
+    <link rel="icon" type="image" th:href="@{/files/favicon.png}">
+    <link rel="stylesheet" th:href="@{${cssfiles}+'/index.css'}">
+    <link rel="stylesheet nofollow" th:href="${cssfiles}+'/textformat.css'">
+</head>
+<body>
+    <img src="files/logo.png" alt="here must be logo ¯\_(ツ)_/¯" width="896px" height="521px" class="imglogo">
+    <br>
+    <span class="All-title">Дуркач</span>
+    <br><br>
+    <span class="main-description">Дуркач - анонимный форум для всех, кто хочет простого общения без аккаунтов, рейтингов, регистрации и смс.
+        Что здесь можно сделать: посетить доску с конкретной тематикой, где сможете пообщаться в компании единомышленников и посмотреть
+        тематический контент; посетить общую доску (<span style="color: #3dff00">/b</span>), если хотите поговорить на общие темы с минимумом ограничений.
+        Важно помнить, что анонимность не освобождает от соблюдения местных правил, поэтому перед постингом рекомендуется ознакомиться с ними.</span>
+    <br><br>
+    <p class="main_theme">Палаты</p>
+    <div class="links">
+        <span th:each="bord:${bordlist}">
+            <a th:href="${bord.name}" th:text="${bord.name}+' - '+${bord.displayedname}"></a>
+            <br>
+        </span>
+    <br>
+    </div>
+
+<div class="underpage-content">
+        work in progress...
+        <br>
+        <span>
+        Содержимое сайта предназначено для 18+ пользователей. Администрация сайта не несёт ответственности за размещаемый контент.
+        За размещённую информацию личную ответственность несёт лицо, разместившее эту информацию на странице. Все права и копирайты принадлежат правообладателям.
+        Все сообщения принадлежат отправителям. Посмотреть <a href="/rules">правила</a> можно <a href="/rules">здесь</a>
+    </span>
+    </div>
+</body></html>

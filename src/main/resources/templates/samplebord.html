@@ -1,0 +1,181 @@
+<!DOCTYPE html><html xmlns:th="https://www.thymeleaf.org" lang="ru"><head>
+    <title th:text="${bord.name}">/b</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image" th:href="@{/files/favicon.png}">
+    <link rel="stylesheet nofollow" th:href="${cssfiles}+'/bred.css'">
+    <link rel="stylesheet nofollow" th:href="${cssfiles}+'/textformat.css'">
+    <script th:src="${jsfiles}+'/main.js'"></script>
+</head>
+<body>
+<div class="upside-bar">
+    <div class="overlay">
+        <span class="overlaybutton" id="overlaymain">
+            <a href="/">Главная</a>
+        </span>
+        <span class="overlaybutton" id="overlaybords" onclick="OverlayBordsCssChange()">
+            Доски
+        </span>
+        <span class="overlaybutton" id="overlaysettings" onclick="OverlaySettingsCssChange()">
+            Настройки
+        </span>
+        <div class="overlaydropdownbords">
+            <span th:each="bords:${bordlist}" style="display: contents;width: inherit;">
+                <a th:href="${bords.name}" th:text="${bords.name}" style="display: block;width: inherit;"></a>
+            </span>
+        </div>
+        <div class="overlaydropdownsettings" id="overlay_settings">
+            <span>Скоро появится</span>
+        </div>
+    </div>
+    <div class="info-messages" id="msginfo">
+        message
+    </div>
+</div>
+<br>
+<div class="bheader">
+    <span th:text="${bord.displayedname}"></span>
+</div>
+<p>
+</p>
+<div class="create-thread">
+    <button type="button" class="create-thread-button" onclick="createThreadButtonCss()">Создать тред</button>
+    <p>
+    </p>
+    <div class="create-thread-form">
+        <form id="create-thread-form">
+            <p style="width: min-content;">
+                <textarea maxlength="1000" name="text" cols="30" rows="40" placeholder="Сообщение..." style="height: 100px;resize: none" required="" id="textzone" oninput="formCharCount()"></textarea>
+                <span class="char-counter" id="form_char_count">0/1000</span>
+            </p>
+            <p>
+                <button type="button" id="add_strong_txt" onclick="addTextFormatStrong()" class="txt-strong-icon">[/s]
+                </button>
+                <button type="button" id="add_cursive_txt" onclick="addTextFormatCursive()" class="txt-cursive-icon">
+                    [/i]
+                </button>
+                <button type="button" id="add_spoiler_txt" onclick="addTextFormatSpoiler()" class="txt-spoiler-icon">
+                    [/spoiler]
+                </button>
+            </p>
+            <p>
+                Прикрепить файл (не больше 4, не больше 2 видео, до 14 MB)
+                <br>
+                <input type="file" id="attached-file" name="formfile" accept="image/*, video/*" multiple="">
+            </p>
+            <p><input type="hidden" name="bord_id" readonly="" th:value="${bord.id}"></p>
+            <p>
+                <button type="submit" id="reply-form-send-button" class="create-thread-form-btn">Отправить</button>
+            </p>
+        </form>
+    </div>
+    <script th:src="${jsfiles}+'/createform.js'"></script>
+</div>
+<div class="threads">
+    <div th:each="thread : ${threads}">
+        <div class="thread"  th:id="'th_' + ${thread.id}">
+            <div class="reply" th:id="'rep_' + ${thread.firstReply.id}">
+                <div th:id="'recv_' + ${thread.firstReply.number}">
+                    <div class="name-date-time">
+                        <span>Аноним</span>
+                        <span th:text="${thread.firstReply.date}"></span>
+                        <span><a th:href="${thread.bordid.name}+'/thread/' + ${thread.id}" th:text="'№' + ${thread.firstReply.number}"></a></span>
+                        <span th:if="${thread.firstReply.op}" class="OP-lable">!TC</span>
+                        <span th:if="${thread.locked}" class="lock-lable">
+                            <img th:src="@{/files/lock.png}" style="height: 1em;width: 1em;" alt="!LKD" title="Закрыт">
+                        </span>
+                        <span th:if="${thread.pinned}" class="pin-lable">
+                            <img th:src="@{/files/pin.png}" style="height: 1em;width: 1em;" alt="!PND" title="Закреплен">
+                        </span>
+                        <span class="enter-thread-link"><a th:href="${thread.bordid.name}+'/thread/' + ${thread.id}" th:text="Ответ"></a></span>
+                        <span>
+                            <button type="button" name="replyprop" class="replyprop-btn" th:onclick="'reportFormCssChange('+${thread.firstReply.number}+')'">︙</button>
+                        </span>
+                        <br>
+                    </div>
+                    <div class="attached_file" th:if="${thread.firstReply.img_paths != null}">
+                        <div th:each="image,itimg : ${thread.firstReply.img_paths}">
+                            <img th:if="${#strings.contains(image, 'thumb')}" th:src="@{${image}}" style="display: block;" class="attached-file-thumb lazy" th:data-src="@{${image}}"
+                                 th:id="${thread.firstReply.id} + '_' + ${itimg.index}+'_img_thumb'" th:attr="onclick='createContentwindow(&quot;' + ${thread.firstReply.img_paths[itimg.index+1]} + '&quot;,&quot;image&quot;)'">
+                            <video th:if="${#strings.contains(image, 'vid')}" style="" th:id="${thread.firstReply.id} + '_' + ${itimg.index}+'_vid'"
+                                   th:attr="onclick='createContentwindow(&quot;' + ${thread.firstReply.img_paths[itimg.index]} + '&quot;,&quot;video&quot;)'" class="video-file lazy" th:data-src="@{${image}}">
+                            </video>
+                        </div>
+                    </div>
+                    <span class="reply-text" th:utext="${thread.firstReply.text}"></span>
+                    <div class="repliers">
+                <span class="reply-from">
+                    <span th:each="repliers:${thread.firstReply.repliers_list}">
+                    <a th:attr="onclick='addRecieverToForm(' + ${repliers} + ')'" style="cursor: pointer;" th:text="'>>'+${repliers}"> </a>
+                        </span>
+                </span>
+                    </div>
+                </div>
+                <div class="report-form" th:id="'report_form_form_'+${thread.firstReply.number}" style="display: none">
+                    <span style="font-style: italic;color: #df9898;">Репорт:</span>
+                    <form th:id="'report_form_'+${thread.firstReply.number}">
+                        <input name="reporttext" type="text" id="report_text_field" placeholder="Текст жалобы...">
+                        <button type="submit" id="report_form_send_button">Отправить</button>
+                    </form>
+                </div>
+            </div>
+            <div th:each="reply : ${thread.lastReplies}">
+                <div class="reply" th:id="'rep_' + ${reply.id}">
+                    <div th:id="'recv_' + ${reply.number}">
+                        <div class="name-date-time">
+                            <span>Аноним</span>
+                            <span th:text="${reply.date}"></span>
+                            <span>
+                                <a th:attr="onclick='redirectFromBordPageByReply(' + ${reply.threadid.id} + ','+${reply.id}+')'"
+                                   th:text="'№' + ${reply.number}"></a>
+                            </span>
+                            <span th:if="${reply.op}" class="OP-lable">!TC</span>
+                            <br>
+                        </div>
+                        <div class="attached_file" th:if="${reply.img_paths != null}">
+                            <div th:each="image, itimg: ${reply.img_paths}">
+                                <img th:if="${#strings.contains(image, 'thumb')}" th:src="@{${image}}" style="display: block;" class="attached-file-thumb lazy" th:data-src="@{${image}}"
+                                     th:id="${reply.id} + '_' + ${itimg.index}+'_img_thumb'" th:attr="onclick='createContentwindow(&quot;'+${reply.img_paths[itimg.index+1]}+'&quot;,&quot;image&quot;)'">
+                                <video th:if="${#strings.contains(image, 'vid')}" style="" th:id="${reply.id} + '_' + ${itimg.index}+'_vid'"
+                                       th:attr="onclick='createContentwindow(&quot;'+${reply.img_paths[itimg.index]}+'&quot;,&quot;video&quot;)'" class="video-file lazy" th:data-src="@{${image}}">
+                                </video>
+                            </div>
+                        </div>
+                        <span class="reply-to" th:if="${reply.receiver_list!=null}" th:each="receiver:${reply.receiver_list}">
+                            <a th:attr="onclick='redirectFromBordPageByReply('+${reply.threadid.id}+','+${receiver}+')'" style="cursor: pointer;" th:text="'>>'+${receiver}"></a>
+                            <br>
+                        </span>
+                        <span class="reply-text" th:utext="${reply.text}"></span>
+                        <div class="repliers">
+                <span class="reply-from">
+                    <span th:each="repliers:${reply.repliers_list}">
+                    <a th:attr="onclick='addRecieverToForm(' + ${repliers} + ')'" style="cursor: pointer;" th:text="'>>'+${repliers}"> </a>
+                        </span>
+                </span>
+                        </div>
+                        <div class="repliers"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="${jsfiles}+'/reportform.js'"></script>
+
+<div class="content-window" id="content_window">
+    <span id="close_window_btn" class="content-window-close-icon" onclick="closeContentwindow()">X</span>
+    <div id="content_window_file" class="content-window-file">
+    </div>
+</div>
+
+<br>
+<div class="underpage-content">
+    work in progress...
+    <br>
+    <span>
+        Содержимое сайта предназначено для 18+ пользователей. Администрация сайта не несёт ответственности за размещаемый контент.
+        За размещённую информацию личную ответственность несёт лицо, разместившее эту информацию на странице. Все права и копирайты принадлежат правообладателям.
+        Все сообщения принадлежат отправителям. Посмотреть <a href="/rules">правила</a> можно <a href="/rules">здесь</a>
+    </span>
+</div>
+
+</body></html>

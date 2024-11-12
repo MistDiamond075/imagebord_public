@@ -1,0 +1,94 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: admin
+  Date: 27.04.2024
+  Time: 0:35
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>/b</title>
+    <link rel="stylesheet" href="css/bred.css">
+    <script src="js/main.js"></script>
+</head>
+<body>
+    <div class="overlay">
+        <span class="overlaybutton" id="overlaymain">
+            <a href="http://localhost:60833/">Главная</a>
+        </span>
+        <span class="overlaybutton" id="overlaybords" onclick="OverlayBordsCssChange()">
+            <!--<a href="http://localhost:8080/">Доски</a>-->Доски
+        </span>
+        <span class="overlaybutton" id="overlaysettings">
+            <!--<a href="http://localhost:8080/">Настройки</a>-->Настройки
+        </span>
+        <div class="overlaydropdownbords">
+            <a href="/b">/b</a>
+            <br/>
+            <a href="/dev">/dev</a>
+        </div>
+        <div class="overlaydropdownsettings">
+        </div>
+        </div>
+    <br/>
+    <div class="bheader">
+            <h2>Бред</h2>
+    </div>
+    <p/>
+    <div class="create-thread">
+        <button type="button" class="create-thread-button" onclick="createThreadButtonCss()">Создать тред</button>
+        <p/>
+        <div class="create-thread-form">
+            <form onsubmit="">
+                <p><input type="text" placeholder="Текст" required></p>
+                <p><button type="submit" id="create_thread_confirm_button">Создать</button></p>
+            </form>
+        </div>
+    </div>
+    <div class="threads">
+        <div class="name-date-time">
+            <span id="name1">Аноним</span>
+            <span id="date-time1">01.05.2024 22:19</span>
+            <span id="number1"><a href="http://localhost:60833">№1</a></span>
+            <span class="enter-thread-link" id="enter-link1"><a href="http://localhost:60833">Ответ</a></span>
+        </div>
+        <div class="attached_file"></div>
+        Quake II RTX is a cutting-edge, ray-traced reimagining of id software’s old school classic, by NVIDIA’s Lightspeed Studios.
+        Global lighting effects, including realistic reflections, refraction, shadows, ambient occlusion and global illumination are a result of the path-traced simulation of light.
+        <div class="reply">
+            <div class="name-date-time">
+                <span id="name2">Аноним</span>
+                <span id="date-time2">01.05.2024 22:31</span>
+                <span id="number2"><a href="http://localhost:60833">№2</a></span>
+            </div>
+            <div class="attached_file"></div>
+            <span>asdf</span>
+        </div>
+        <div class="reply">
+            <div class="name-date-time">
+                <span id="name3">Аноним</span>
+                <span id="date-time3">01.05.2024 23:17</span>
+                <span id="number3"><a href="http://localhost:60833">№3</a></span>
+            </div>
+            <div class="attached_file"></div>
+            <span>another one</span>
+        </div>
+        <div class="reply">
+            <div class="name-date-time">
+                <span id="name4">Аноним</span>
+                <span id="date-time4">01.05.2024 23:17</span>
+                <span id="number4"><a href="http://localhost:60833">№4</a></span>
+            </div>
+            <div class="attached_file"></div>
+            <span>Adding welcome page template: index
+ o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+ c.i.i.ImagebordTestApplication           : Started ImagebordTestApplication in 4.725 seconds (process running for 5.713)
+ o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2 o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms</span>
+        </div>
+    </div>
+work in progress...
+</body>
+</html>
