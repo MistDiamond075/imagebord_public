@@ -1,0 +1,24 @@
+config:
+  target: "https://localhost:60834"   # Замените на адрес вашего приложения
+  phases:
+    - duration: 10                   # Длительность теста в секундах
+      arrivalRate: 1                # Число запросов в секунду (для теста 1 запрос в секунду)
+  tls:
+    insecure: true
+
+scenarios:
+  - flow:
+      - post:
+          url: "/addReply/15"          # Конечная точка POST запрос
+          headers:
+            Content-Type: "multipart/form-data; boundary=----WebKitFormBoundaryh2geiR6riALiXAKm"
+            #Cookie: "Idea-18d9c86e=59d87443-812c-4b4a-ad96-0aeda9b60cb5; userSessionId=4493228e-0a80-4b11-9261-af2f6d17b51c; JSESSIONID=C855AB3099BE1512454954404C03F84E; XSRF-TOKEN=aj9gmfo3qondigvefedsdt41kj; JWT-SESSION=eyJhbGciOiJIUzI1NiJ9.eyJsYXN0UmVmcmVzaFRpbWUiOjE3Mjk4NzkzMTkwMzAsInhzcmZUb2tlbiI6ImFqOWdtZm8zcW9uZGlndmVmZWRzZHQ0MWtqIiwianRpIjoiZTk0NTAwNTMtM2M3Ny00MDNkLThlMTgtNGQwZDgwODFjZmZiIiwic3ViIjoiZWVjZmVjYjItNTA1NC00NGQ3LWI3ZjMtYzFkMzU3YTg5MTg3IiwiaWF0IjoxNzI5ODc3NzkyLCJleHAiOjE3MzAxMzg1MTl9.ZDlCvdOoSk5DcAaoJ3P3TkAJUki-Upo4JquBDSrp1Ao"
+          fields:
+            # JSON-данные как поле для multipart/form-data  
+            - name: "replyentitydata"
+              value: '{id: "null",thread_id: "null",text: "text",date: "0.0.0 00:00",imagepath: "null",ipreplying: "",receiver: "null",status: "sending"}'
+            # Параметр isOP
+            - name: "isOP"
+              value: 'false'
+            # Файл
+            #attached_files: 
