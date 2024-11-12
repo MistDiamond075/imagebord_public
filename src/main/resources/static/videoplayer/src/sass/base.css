@@ -1,0 +1,17 @@
+/* Error: Undefined mixin.
+ *   ,
+ * 7 |   @include plyr-font-smoothing($plyr-font-smoothing);
+ *   |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *   '
+ *   C:\Users\egoru\OneDrive\Рабочий стол\imagebord-main\src\main\resources\static\videoplayer\src\sass\base.scss 7:3  root stylesheet */
+
+body::before {
+  font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
+      "Droid Sans Mono", monospace, monospace;
+  white-space: pre;
+  display: block;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid black;
+  content: "Error: Undefined mixin.\a   \2577 \a 7 \2502    @include plyr-font-smoothing($plyr-font-smoothing);\a   \2502    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\a   \2575 \a   C:\\Users\\egoru\\OneDrive\\\420 \430 \431 \43e \447 \438 \439  \441 \442 \43e \43b \\imagebord-main\\src\\main\\resources\\static\\videoplayer\\src\\sass\\base.scss 7:3  root stylesheet";
+}
