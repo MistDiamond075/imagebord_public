@@ -16,24 +16,24 @@ public class ctrlBords {
         this.srvBords = srvBords;
     }
 
-    @GetMapping(path="/getBords")
+    @GetMapping(path="¯\_(ツ)_/¯")
     public @ResponseBody Iterable<entBords> getBords(){
         return srvBords.getBordsAll();
     }
 
-    @GetMapping(path="/getBord/{id}")
+    @GetMapping(path="¯\_(ツ)_/¯")
     public @ResponseBody entBords getBordById(@PathVariable Long id){
         return srvBords.getBordById(id);
     }
 
     @PostMapping(path = "¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MAINADMIN"})
     public @ResponseBody entBords addBord(@RequestBody entBords bord){
         return srvBords.addBord(bord);
     }
 
     @DeleteMapping(path = "¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MAINADMIN"})
     public entBords delBord(@PathVariable Long id){
         return srvBords.deleteBordById(id);
     }

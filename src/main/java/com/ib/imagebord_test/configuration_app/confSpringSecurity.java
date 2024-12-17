@@ -32,8 +32,8 @@ public class confSpringSecurity {
                 )))
                 .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("%%mod_access%%").hasAnyRole("¯\_(ツ)_/¯","¯\_(ツ)_/¯")
-                        .requestMatchers("%%admin_access%%").hasRole("¯\_(ツ)_/¯")
+                        .requestMatchers("¯\_(ツ)_/¯").hasAnyRole("ADMIN","MODERATOR","MAINADMIN")
+                        .requestMatchers("¯\_(ツ)_/¯").hasAnyRole("ADMIN","MAINADMIN")
                         .anyRequest().permitAll()
                 ).formLogin(formLogin ->
                         formLogin
@@ -43,8 +43,10 @@ public class confSpringSecurity {
                 ).
                 logout(logout ->
                         logout
-                                .logoutUrl("¯\_(ツ)_/¯")
+                                .logoutUrl("¯\_(ツ)_/¯/logout")
                                 .logoutSuccessUrl("/")
+                                .invalidateHttpSession(true)
+                                .clearAuthentication(true)
                                 .permitAll()
                 );
         httpsec.addFilterBefore(new CookieFilter(propsCookies), UsernamePasswordAuthenticationFilter.class);

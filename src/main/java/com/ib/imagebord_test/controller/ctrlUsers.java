@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Secured({"¯\_(ツ)_/¯"})
+@Secured({"ADMIN","MAINADMIN"})
 @RequestMapping("¯\_(ツ)_/¯")
 public class ctrlUsers {
     private final serviceUsers srvUsers;
@@ -30,11 +30,13 @@ public class ctrlUsers {
     }
 
     @PostMapping(path="¯\_(ツ)_/¯")
+    @Secured("MAINADMIN")
     public @ResponseBody entUsers addUser(@RequestBody entUsers newuser){
         return srvUsers.addUser(newuser);
     }
 
     @DeleteMapping(path="¯\_(ツ)_/¯")
+    @Secured("MAINADMIN")
     public @ResponseBody entUsers delUserByUsername(@PathVariable String username){
         return srvUsers.deleteUserByUsername(username);
     }

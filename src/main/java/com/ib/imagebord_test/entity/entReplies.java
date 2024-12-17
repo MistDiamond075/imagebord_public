@@ -43,6 +43,9 @@ public class entReplies {
     @Column(name="ip")
     private String ip;
 
+    @Column(name="postername")
+    private String postername;
+
     @OneToMany(mappedBy = "repliesid",cascade = CascadeType.REMOVE)
     private List<entPostfiles> postfiles;
 
@@ -182,5 +185,13 @@ public class entReplies {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getPostername() {
+        return postername;
+    }
+
+    public void setPostername(String is_admin) {
+        this.postername = is_admin;
     }
 }

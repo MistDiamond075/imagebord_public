@@ -58,7 +58,7 @@ public class serviceDbDataSaver {
     }
 
     public  void updateThreadPostcountByThreadId(Long thread_id,boolean increase){
-        if(thread_id!=null && bord_active_threads.containsKey(thread_id)) {
+        if(thread_id!=null && thread_post_count.containsKey(thread_id)) {
             if (increase) {
                 thread_post_count.merge(thread_id, 1, Integer::sum);
             } else {

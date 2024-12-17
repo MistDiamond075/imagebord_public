@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Secured({"¯\_(ツ)_/¯"})
+@Secured({"ADMIN","MODERATOR","MAINADMIN"})
 @RequestMapping(path = "¯\_(ツ)_/¯")
 public class ctrlBanlist {
     private final serviceBanlist srvBanlist;
@@ -25,10 +25,10 @@ public class ctrlBanlist {
     }
 
     @PostMapping(path = "¯\_(ツ)_/¯")
-    @Secured("¯\_(ツ)_/¯")
+    @Secured({"ADMIN","MAINADMIN"})
     public @ResponseBody entBanlist addBan(@AuthenticationPrincipal UserDetails userDetails, @RequestBody entBanlist ban){return srvBanlist.addBan(ban,userDetails);}
 
     @DeleteMapping(path="¯\_(ツ)_/¯")
-    @Secured("¯\_(ツ)_/¯")
+    @Secured({"ADMIN","MAINADMIN"})
     public @ResponseBody entBanlist deleteBanlist(@AuthenticationPrincipal UserDetails userDetails,@RequestBody entBanlist ban){return srvBanlist.removeBan(ban);}
 }

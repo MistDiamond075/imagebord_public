@@ -6,14 +6,15 @@ import com.ib.imagebord_test.entity.entThread;
 import com.ib.imagebord_test.service.serviceBords;
 import com.ib.imagebord_test.service.serviceReplies;
 import com.ib.imagebord_test.service.serviceThread;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.Set;
@@ -42,18 +43,20 @@ public class ctrlPage {
     public String rulespage(){return "rules";}
 
     @GetMapping(path="¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public String adminrulespage(){return "adminrules";}
 
     @GetMapping(path = {"¯\_(ツ)_/¯"})
     public String adminloginpage(){return "adminlogin";}
 
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     @GetMapping(path ={ "¯\_(ツ)_/¯","¯\_(ツ)_/¯"})
-    public String adminpage(){return "adminmenu";}
+    public String adminpage(Model model){
+        model.addAttribute("bords",srvBords.getBordList());
+        return "adminmenu";}
 
     @GetMapping({"/{bordname}","/{bordname}/"})
-    public String bredpage(Model model, @PathVariable String bordname){
+    public String bredpage(Model model, @PathVariable String bordname, @AuthenticationPrincipal UserDetails userDetails){
         if (bordname.equals("favicon.png")||bordname.equals("favicon.ico")) {
             System.out.println("favicon");
         return null;
@@ -64,15 +67,31 @@ public class ctrlPage {
         model.addAttribute("threads",threads);
         model.addAttribute("bord",bord);
         model.addAttribute("bordlist",bords);
+        String userrole=null;
+        if(userDetails!=null) {
+            userrole = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse(null);
+        }
+        model.addAttribute("user",userrole);
         return "samplebord";
     }
 
     @GetMapping(path={"/{bordname}/thread/{id}","/{bordname}/thread/{id}/"})
-    public String bredpageth(@PathVariable Long id,Model model) {
+    public String bredpageth(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         List<entBords> bords=srvBords.getBordsAll();
         List<entReplies> replies=srvReplies.setRepliesDisplayedData(id);
         model.addAttribute("replies",replies);
         model.addAttribute("bordlist",bords);
+        String userrole=null;
+        if(userDetails!=null) {
+            userrole = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse(null);
+        }
+        model.addAttribute("user",userrole);
         return "samplepage";
     }
 }

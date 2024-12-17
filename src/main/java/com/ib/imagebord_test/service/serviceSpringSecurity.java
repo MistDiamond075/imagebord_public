@@ -24,7 +24,7 @@ public class serviceSpringSecurity implements UserDetailsService {
         if (user == null) {
             return null;
         }
-        if(user.getRole().equals("¯\_(ツ)_/¯") || user.getRole().equals("¯\_(ツ)_/¯")) {
+        if(user.getRole().equals("ROLE_ADMIN") || user.getRole().equals("ROLE_MODERATOR") || user.getRole().equals("ROLE_MAINADMIN")) {
             return new org.springframework.security.core.userdetails.User(
                     user.getUsername(),
                     user.getPassword(),

@@ -9,17 +9,17 @@ public class serviceAuditJournal{
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public serviceAuditJournal(){
-        adminlog=new File("src/main/resources/adminlog.txt");
+        adminlog=new File("src/main/files/adminlog.txt");
     }
 
-    public void addBanActivityToLog(String adminname, String ip, String cause, String period,boolean banadded){
+    public void addBanActivityToLog(String adminname,String role, String ip, String cause, String period,boolean banadded){
         lock.writeLock().lock();
         try(FileWriter writer=new FileWriter(adminlog,true)){
             Timestamp timestamp=new Timestamp(System.currentTimeMillis());
             if(banadded) {
-                writer.write("[" + timestamp + "] " + adminname + " ЗАБАНИЛ пользователя с ip " + ip + " по причине " + cause + " на срок до " + period + '\n');
+                writer.write("[" + timestamp + "] "+parseUserRole(role)+" " + adminname + " ЗАБАНИЛ пользователя с ip " + ip + " по причине " + cause + " на срок до " + period + '\n');
             }else{
-                writer.write("[" + timestamp + "] " + adminname + " РАЗБАНИЛ пользователя с ip " + ip + ", забаненного по причине " + cause + " на срок до " + period + '\n');
+                writer.write("[" + timestamp + "] "+parseUserRole(role)+" " + adminname + " РАЗБАНИЛ пользователя с ip " + ip + ", забаненного по причине " + cause + " на срок до " + period + '\n');
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -28,22 +28,22 @@ public class serviceAuditJournal{
         }
     }
 
-    public void addThreadActivityToLog(String adminname,String thread_id,int action){
+    public void addThreadActivityToLog(String adminname,String role,String thread_id,int action){
         lock.writeLock().lock();
         try(FileWriter writer=new FileWriter(adminlog,true)){
             Timestamp timestamp=new Timestamp(System.currentTimeMillis());
             switch (action) {
                 case 1 -> {
-                    writer.write("[" + timestamp + "] " + adminname + " ЗАКРЕПИЛ тред с id " + thread_id + '\n');
-                    break;
+                    writer.write("[" + timestamp + "] "+parseUserRole(role)+" "  + adminname + " ЗАКРЕПИЛ тред с id " + thread_id + '\n');
                 }
                 case 2 -> {
-                    writer.write("[" + timestamp + "] " + adminname + " ЗАКРЫЛ для постинга тред с id " + thread_id + '\n');
-                    break;
+                    writer.write("[" + timestamp + "] "+parseUserRole(role)+" "  + adminname + " ЗАКРЫЛ для постинга тред с id " + thread_id + '\n');
+                }
+                case 3 ->{
+                    writer.write("[" + timestamp + "] "+parseUserRole(role)+" "  + adminname + " написал в ЗАКРЫТЫЙ тред с id " + thread_id + '\n');
                 }
                 default -> {
-                    writer.write("[" + timestamp + "] " + adminname + " совершил неизвестное действие с тредом с id " + thread_id + '\n');
-                    break;
+                    writer.write("[" + timestamp + "] "+parseUserRole(role)+" "  + adminname + " совершил неизвестное действие с тредом с id " + thread_id + '\n');
                 }
             }
         }catch (IOException e){
@@ -53,11 +53,37 @@ public class serviceAuditJournal{
         }
     }
 
-    public void addReportActivityToLog(String adminname,String report_id,String status){
+    public void addReportActivityToLog(String adminname,String role,String report_id,String status){
         lock.writeLock().lock();
         try(FileWriter writer=new FileWriter(adminlog,true)){
             Timestamp timestamp=new Timestamp(System.currentTimeMillis());
-            writer.write("["+timestamp+"] "+adminname+" ОБРАБОТАЛ РЕПОРТ с id "+report_id+" и поставил ему статус "+status+'\n');
+            writer.write("["+timestamp+"] "+parseUserRole(role)+" " +adminname+" ОБРАБОТАЛ РЕПОРТ с id "+report_id+" и поставил ему статус "+status+'\n');
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public void addTextAutoFormatActivityToLog(String adminname,String role,String bornshortame,boolean status,int action){
+        lock.writeLock().lock();
+        try(FileWriter writer=new FileWriter(adminlog,true)){
+            Timestamp timestamp=new Timestamp(System.currentTimeMillis());
+            switch (action) {
+                case 1 -> {
+                    if(status) {
+                        writer.write("[" + timestamp + "] " + parseUserRole(role) + " " + adminname + " ВКЛЮЧИЛ автозамену на доске " + bornshortame + '\n');
+                    }else{
+                        writer.write("[" + timestamp + "] " + parseUserRole(role) + " " + adminname + " ВЫКЛЮЧИЛ автозамену на доске " + bornshortame + '\n');
+                    }
+                }
+                case 2 -> {
+                    writer.write("[" + timestamp + "] "+parseUserRole(role)+" "  + adminname + " ИЗМЕНИЛ список автозамены на доске " + bornshortame + '\n');
+                }
+                default -> {
+                    writer.write("[" + timestamp + "] "+parseUserRole(role)+" "  + adminname + " совершил неизвестное действие с автозаменой на доске "+bornshortame+ '\n');
+                }
+            }
         }catch (IOException e){
             e.printStackTrace();
         }finally {
@@ -105,5 +131,21 @@ public class serviceAuditJournal{
         }finally {
             lock.writeLock().unlock();
         }
+    }
+
+    private String parseUserRole(String role){
+        String rolestr="unknown";
+        switch (role) {
+            case "ROLE_ADMIN" -> {
+                rolestr = "Администратор";
+            }
+            case "ROLE_MODERATOR" -> {
+                rolestr = "Модератор";
+            }
+            case "ROLE_MAINADMIN" -> {
+                rolestr = "Главный администратор";
+            }
+        }
+        return rolestr;
     }
 }

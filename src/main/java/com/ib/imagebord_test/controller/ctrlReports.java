@@ -21,24 +21,24 @@ public class ctrlReports {
         this.srvReports=srvReports;
     }
 
-    @GetMapping(path = {"¯\_(ツ)_/¯"})
-    @Secured({"¯\_(ツ)_/¯"})
+    @GetMapping(path = {"¯\_(ツ)_/¯","¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody List<entReports> getReports(){return srvReports.getReportsAll();}
 
     @GetMapping(path="¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody List<entReports> getReportsByStatus(@PathVariable entReports.Status status){
         return srvReports.getReportsByStatus(status);
     }
 
     @GetMapping(path = "¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody entReports getReportById(@PathVariable Long id){
         return srvReports.getReportById(id);
     }
 
     @PatchMapping(path = "¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody entReports updateReportStatus(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id, @PathVariable entReports.Status status){
         return srvReports.updateReportStatus(id,status,userDetails);
     }

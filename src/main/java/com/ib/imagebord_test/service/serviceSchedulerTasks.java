@@ -32,19 +32,21 @@ public class serviceSchedulerTasks {
     private final serviceBanlist srvBanlist;
     private final serviceReports srvReports;
     private final servicePostfiles srvPostfiles;
+    private final serviceTextAutoFormat srvAFT;
     private final serviceAuditJournal srvAuditJournal=new serviceAuditJournal();
     private final String time_pattern="dd.MM.yyyy HH:mm:ss";
     private final String ban_period_time_pattern="yyyy-MM-dd";
     private final int active_threads_cap=7;
 
     @Autowired
-    public serviceSchedulerTasks(serviceBords srvBords, serviceDbDataSaver srvDbDataSaver, serviceThread srvThread, serviceBanlist srvBanlist, serviceReports srvReports, servicePostfiles srvPostfiles) {
+    public serviceSchedulerTasks(serviceBords srvBords, serviceDbDataSaver srvDbDataSaver, serviceThread srvThread, serviceBanlist srvBanlist, serviceReports srvReports, servicePostfiles srvPostfiles, serviceTextAutoFormat srvAFT) {
         this.srvBords = srvBords;
         this.srvDbDataSaver=srvDbDataSaver;
         this.srvThread=srvThread;
         this.srvBanlist = srvBanlist;
         this.srvReports = srvReports;
         this.srvPostfiles = srvPostfiles;
+        this.srvAFT = srvAFT;
     }
 
     @Async

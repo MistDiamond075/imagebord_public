@@ -13,6 +13,7 @@ import com.ib.imagebord_test.repository.repBords;
 import com.ib.imagebord_test.repository.repThread;
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,12 +57,18 @@ public class serviceThread {
     }
 
     public entThread getThreadById(Long id){
-        return rThread.findById(id).orElseThrow(()->new RuntimeException("thread not found when getting by id"));
+        entThread thread=rThread.findById(id).orElseThrow(()->new RuntimeException("thread not found when getting by id"));
+        thread.setPostcount(srvDbDataSaver.getThreadPostcountByThreadId(thread.getId()));
+        return thread;
     }
 
     public List<entThread> getThreadAll(){
         try{
-        return (List<entThread>) rThread.findAll();
+            List<entThread> threads=(List<entThread>) rThread.findAll();
+            for(entThread thread:threads){
+                thread.setPostcount(srvDbDataSaver.getThreadPostcountByThreadId(thread.getId()));
+            }
+        return threads;
         }catch(RuntimeException e){
             e.printStackTrace();
             return null;
@@ -69,7 +76,9 @@ public class serviceThread {
     }
 
     public entThread getThreadByBordId(Long id){
-        return rThread.findByBordidId(id).orElseThrow(()->new RuntimeException("thread not found when getting by bord id"));
+        entThread thread=rThread.findByBordidId(id).orElseThrow(()->new RuntimeException("thread not found when getting by bord id"));
+        thread.setPostcount(srvDbDataSaver.getThreadPostcountByThreadId(thread.getId()));
+        return thread;
     }
 
     public List<entThread> getThreadAllByBordName(String bordshortname){
@@ -84,13 +93,7 @@ public class serviceThread {
     public List<entThread> getThreadsForBordPage(String bordshortname){
         List<entThread> threads = rThread.findAllByBordidName(bordshortname);
         Collections.reverse(threads);
-        int j = 0;
-        for (int i = 0; i < threads.size(); i++) {
-            if (threads.get(i).getPinned()) {
-                Collections.swap(threads, i, j);
-                j++;
-            }
-        }
+        threads=sortThreads(threads);
 
         return threads.stream().peek(thread -> {
             try {
@@ -111,7 +114,7 @@ public class serviceThread {
                 firstReply.setImg_paths(imgpaths);
             thread.setFirstReply(firstReply);
             List<entReplies> latestReplies = srvReplies.getReplyLast3ByThreadId(thread.getId());
-            if(thread.getPostcount()<=3){
+            if(srvDbDataSaver.getThreadPostcountByThreadId(thread.getId())<=3){
                 latestReplies.remove(latestReplies.size()-1);
             }
                 for (entReplies reply : latestReplies) {
@@ -163,7 +166,7 @@ public class serviceThread {
     }
 
     @Transactional
-    public entThread addThread(entThread new_thread, MultipartFile[] attached_files, Long bord_id, Cookie[] cookies,String ipaddr){
+    public entThread addThread(entThread new_thread, MultipartFile[] attached_files, Long bord_id, Cookie[] cookies,String ipaddr,UserDetails userDetails){
         try {
             if(srvBanlist.checkIp(ipaddr)){
                 return null;
@@ -186,7 +189,7 @@ public class serviceThread {
                 srvDbDataSaver.updateActiveThreadsByBordId(bord_id,true);
                 srvDbDataSaver.addThreadToThreadPostcountMap(new_thread.getId(), 0);
                 srvReplies.addReply(new entReplies(null, new_thread, new_thread.getFposttext(), new_thread.getDate(),addr, null, "send",
-                        bord, false, objectMapper.writeValueAsString(new ArrayList<String>()),ipaddr),attached_files,new_thread.getId(),false,cookies,ipaddr);
+                        bord, false, objectMapper.writeValueAsString(new ArrayList<String>()),ipaddr),attached_files,new_thread.getId(),false,cookies,ipaddr,userDetails);
             }
         }catch (JsonProcessingException | RuntimeException e){
             e.printStackTrace();
@@ -210,7 +213,11 @@ public class serviceThread {
                 entThread thread=thread_opt.get();
                 thread.setPinned(pinned);
                 rThread.save(thread);
-                srvAuditJournal.addThreadActivityToLog(adminuser.getUsername(),String.valueOf(thread.getId()),1);
+                String userrole=adminuser.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .findFirst()
+                        .orElse(null);
+                srvAuditJournal.addThreadActivityToLog(adminuser.getUsername(),userrole,String.valueOf(thread.getId()),1);
                 return thread;
             }catch (RuntimeException e){
                 e.printStackTrace();
@@ -226,7 +233,11 @@ public class serviceThread {
                 entThread thread=thread_opt.get();
                 thread.setLocked(locked);
                 rThread.save(thread);
-                srvAuditJournal.addThreadActivityToLog(adminuser.getUsername(),String.valueOf(thread.getId()),2);
+                String userrole=adminuser.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .findFirst()
+                        .orElse(null);
+                srvAuditJournal.addThreadActivityToLog(adminuser.getUsername(),userrole,String.valueOf(thread.getId()),2);
                 return thread;
             }catch (RuntimeException e){
                 e.printStackTrace();
@@ -256,5 +267,14 @@ public class serviceThread {
         } catch (IOException e) {throw new RuntimeException(e);}
     }
 
-
+    private List<entThread> sortThreads(List<entThread> threads){
+        int j = 0;
+        for (int i = 0; i < threads.size(); i++) {
+            if (threads.get(i).getPinned()) {
+                Collections.swap(threads, i, j);
+                j++;
+            }
+        }
+        return threads;
+    }
 }

@@ -14,7 +14,7 @@ public class confApp {
     public FilterRegistrationBean<Filter> cookieFilterRegistration(CookieFilter cookieFilter) {
         FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(cookieFilter);
-        registrationBean.addUrlPatterns("/*");  
+        registrationBean.addUrlPatterns("/*"); 
         return registrationBean;
     }
 }

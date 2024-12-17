@@ -29,6 +29,9 @@ public class confPropsPaths {
     @Value(value = "${path.samplepage}")
     private String samplepage;
 
+    @Value(value = "${path.files.textautoformatlist}")
+    private String textautoformat_list;
+
     public String getThreadfilesPath() {
         return threadfiles;
     }
@@ -71,5 +74,9 @@ public class confPropsPaths {
 
     public String getSamplepage() {
         return samplepage;
+    }
+
+    public String getTextautoformat_list() {
+        return textautoformat_list;
     }
 }

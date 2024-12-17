@@ -2,6 +2,7 @@ package com.ib.imagebord_test.service;
 
 import com.ib.imagebord_test.entity.entReports;
 import com.ib.imagebord_test.repository.repReports;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +91,11 @@ public class serviceReports {
                 entReports report = report_opt.get();
                 report.setStatus(status);
                 rReports.save(report);
-                srvAuditJournal.addReportActivityToLog(adminuser.getUsername(),String.valueOf(report.getId()),status.toString());
+                String userrole=adminuser.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .findFirst()
+                        .orElse(null);
+                srvAuditJournal.addReportActivityToLog(adminuser.getUsername(),userrole,String.valueOf(report.getId()),status.toString());
                 return report;
             }catch (IllegalArgumentException e){
                 e.printStackTrace();

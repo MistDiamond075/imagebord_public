@@ -30,38 +30,38 @@ public class ctrlThread {
     }
 
     @GetMapping(path = "¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody Iterable<entThread> getThread(){
         return srvThread.getThreadAll();
     }
 
     @GetMapping(path="¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody entThread getThreadById(@PathVariable Long id){
         return srvThread.getThreadById(id);
     }
 
     @PostMapping(path = "addThread/{bord_id}")
-    public @ResponseBody CompletableFuture<entThread> addThread(@RequestPart(value = "files",required = false)MultipartFile[] attached_files, @RequestPart(value = "threadentitydata") entThread thread, @PathVariable Long bord_id, HttpServletRequest request){
+    public @ResponseBody CompletableFuture<entThread> addThread(@RequestPart(value = "files",required = false)MultipartFile[] attached_files, @RequestPart(value = "threadentitydata") entThread thread, @PathVariable Long bord_id, HttpServletRequest request,@AuthenticationPrincipal UserDetails userDetails){
             String addr=request.getRemoteAddr();
             Cookie[] cookie=request.getCookies();
-            return srvQueue.addTask(()-> srvThread.addThread(thread,attached_files,bord_id,cookie,addr));
+            return srvQueue.addTask(()-> srvThread.addThread(thread,attached_files,bord_id,cookie,addr,userDetails));
     }
 
     @DeleteMapping(path="¯\_(ツ)_/¯")
-    @Secured({"¯\_(ツ)_/¯"})
+    @Secured({"ADMIN","MODERATOR","MAINADMIN"})
     public @ResponseBody entThread delThread(@PathVariable Long id){
             return srvThread.deleteThreadById(id);
     }
 
     @PatchMapping("¯\_(ツ)_/¯")
-    @Secured("¯\_(ツ)_/¯")
+    @Secured({"ADMIN","MAINADMIN"})
     public @ResponseBody entThread pinThread(@AuthenticationPrincipal UserDetails userDetails,@PathVariable Long id,@PathVariable boolean pinned){
         return srvThread.updateThreadPinned(id,pinned,userDetails);
     }
 
     @PatchMapping("¯\_(ツ)_/¯")
-    @Secured("¯\_(ツ)_/¯")
+    @Secured({"ADMIN","MAINADMIN"})
     public @ResponseBody entThread lockThread(@AuthenticationPrincipal UserDetails userDetails,@PathVariable Long id,@PathVariable boolean locked){
         return srvThread.updateThreadLocked(id,locked,userDetails);
     }

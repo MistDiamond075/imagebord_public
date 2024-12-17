@@ -1,9 +1,11 @@
 package com.ib.imagebord_test;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 public class GenPasswordCrypt {
     public String generateCryptedPassword(String password) {
-        // ¯\_(ツ)_/¯ generating crypted password code ¯\_(ツ)_/¯
-        System.out.println(hashedPassword);
+		//here should be algorithm for encryption
+        String hashedPassword=password;
         return hashedPassword;
     }
 }

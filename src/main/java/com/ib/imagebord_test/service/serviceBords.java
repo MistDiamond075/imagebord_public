@@ -1,6 +1,5 @@
 package com.ib.imagebord_test.service;
 
-import com.ib.imagebord_test.configuration_app.confPropsPaths;
 import com.ib.imagebord_test.entity.entBords;
 import com.ib.imagebord_test.repository.repBords;
 import jakarta.annotation.PostConstruct;
@@ -16,10 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class serviceBords {
     private final repBords rBords;
     private Set<entBords> bordList= ConcurrentHashMap.newKeySet();
+    private final serviceDbDataSaver srvDbDataSaver;
 
     @Autowired
-    public serviceBords(repBords rBords) {
+    public serviceBords(repBords rBords, serviceDbDataSaver srvDbDataSaver) {
         this.rBords = rBords;
+        this.srvDbDataSaver = srvDbDataSaver;
     }
 
     @PostConstruct
@@ -29,7 +30,12 @@ public class serviceBords {
     
     public List<entBords> getBordsAll(){
         try{
-        return (List<entBords>) rBords.findAll();
+            List<entBords> bords=(List<entBords>) rBords.findAll();
+            for(entBords bord:bords){
+                bord.setPostcount(srvDbDataSaver.getPostcountByBordId(bord.getId()));
+                bord.setActiveThreads(srvDbDataSaver.getActiveThreadsByBordId(bord.getId()));
+            }
+        return bords;
         }catch(RuntimeException e){
             e.printStackTrace();
             return null;
@@ -37,11 +43,17 @@ public class serviceBords {
     }
     
     public entBords getBordById(Long id){
-        return rBords.findById(id).orElseThrow(()->new RuntimeException("bord not found when getting by id"));
+        entBords bord=rBords.findById(id).orElseThrow(()->new RuntimeException("bord not found when getting by id "+id));
+        bord.setPostcount(srvDbDataSaver.getPostcountByBordId(bord.getId()));
+        bord.setActiveThreads(srvDbDataSaver.getActiveThreadsByBordId(bord.getId()));
+        return bord;
     }
 
     public entBords getBordByShotname(String shortname){
-        return rBords.findAllByName(shortname).orElseThrow(()->new RuntimeException("bord not found when getting by shortname"));
+        entBords bord=rBords.findAllByName(shortname).orElseThrow(()->new RuntimeException("bord not found when getting by shortname "+shortname));
+        bord.setPostcount(srvDbDataSaver.getPostcountByBordId(bord.getId()));
+        bord.setActiveThreads(srvDbDataSaver.getActiveThreadsByBordId(bord.getId()));
+        return bord;
     }
 
     @Transactional

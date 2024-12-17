@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("¯\_(ツ)_/¯")
-@Secured({"¯\_(ツ)_/¯"})
+@Secured({"ADMIN","MODERATOR","MAINADMIN"})
 public class ctrlAuditJournal {
     private final serviceAuditJournal srvAuditJournal=new serviceAuditJournal();
 

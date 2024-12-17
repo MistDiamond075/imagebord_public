@@ -4,6 +4,7 @@ import com.ib.imagebord_test.entity.entBanlist;
 import com.ib.imagebord_test.repository.repBanlist;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,11 @@ public class serviceBanlist {
         try{
         rBanlist.save(ban);
         addBanToBanlist(ban.getIp());
-        srvAuditJournal.addBanActivityToLog(adminuser.getUsername(),ban.getIp(), ban.getCause(), ban.getPeriod(),true);
+        String userrole=adminuser.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse(null);
+        srvAuditJournal.addBanActivityToLog(adminuser.getUsername(),userrole,ban.getIp(), ban.getCause(), ban.getPeriod(),true);
         return ban;
         }catch (RuntimeException e){
             e.printStackTrace();

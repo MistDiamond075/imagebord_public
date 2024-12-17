@@ -14,20 +14,21 @@ import com.ib.imagebord_test.repository.repBords;
 import com.ib.imagebord_test.repository.repReplies;
 import com.ib.imagebord_test.entity.entThread;
 import com.ib.imagebord_test.repository.repThread;
-import jakarta.persistence.LockModeType;
 import jakarta.servlet.http.Cookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -36,6 +37,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @EnableAsync
@@ -48,13 +50,16 @@ public class serviceReplies {
     private final confPropsCookies appcookies;
     private final serviceDbDataSaver srvDbDataSaver;
     private final serviceBanlist srvBanlist;
+    private final serviceTextAutoFormat srvAFT;
+    private final serviceAuditJournal srvAuditJournal=new serviceAuditJournal();
     private final ImageMGMT imageMGMT=new ImageMGMT();
     private final VideoMGMT videoMGMT=new VideoMGMT();
     private final ObjectMapper objectMapper=new ObjectMapper();
     private final Safelist text_format_safelist=new Safelist().addTags("span").addAttributes("span", "class", "style");//.addTags("a").addAttributes("a", "href");
 
+
     @Autowired
-    public serviceReplies(repReplies rReplies, repThread rThread, repBords rBords, servicePostfiles srvPostfiles, confPropsPaths apppaths, confPropsCookies appcookies, serviceDbDataSaver srvDbDataSaver, serviceBanlist srvBanlist) {
+    public serviceReplies(repReplies rReplies, repThread rThread, repBords rBords, servicePostfiles srvPostfiles, confPropsPaths apppaths, confPropsCookies appcookies, serviceDbDataSaver srvDbDataSaver, serviceBanlist srvBanlist, serviceTextAutoFormat srvAFT) {
         this.rReplies = rReplies;
         this.rThread = rThread;
         this.rBords = rBords;
@@ -63,6 +68,7 @@ public class serviceReplies {
         this.appcookies = appcookies;
         this.srvDbDataSaver = srvDbDataSaver;
         this.srvBanlist = srvBanlist;
+        this.srvAFT = srvAFT;
     }
 
     public entReplies getReplyById(Long id){
@@ -124,7 +130,7 @@ public class serviceReplies {
     }
 
     @Transactional
-    public entReplies addReply(entReplies new_reply, MultipartFile[] attached_files, Long thread_id, Boolean op, Cookie[] cookie,String ipaddr){
+    public entReplies addReply(entReplies new_reply, MultipartFile[] attached_files, Long thread_id, Boolean op, Cookie[] cookie, String ipaddr, UserDetails userDetails){
         try {
             if(srvBanlist.checkIp(ipaddr)){
                 return null;
@@ -132,7 +138,21 @@ public class serviceReplies {
             entThread thread = rThread.findById(thread_id).orElseThrow(()->new RuntimeException("thread not found when adding reply"));
             entBords bord = rBords.findById(thread.getBordid().getId()).orElseThrow(()->new RuntimeException("bord not found when adding reply"));
             boolean isCap = srvDbDataSaver.getThreadPostcountByThreadId(thread_id) + 1 >= thread.getCap();
-            if (new_reply != null && !isCap && !thread.getLocked()) {
+            boolean isLocked=thread.getLocked();
+            if(isLocked) {
+                if (userDetails != null) {
+                    String userrole = userDetails.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .findFirst()
+                            .orElse(null);
+                    String convertedrole = parseUserRole(userDetails);
+                    if (convertedrole!=null && !convertedrole.equals("Аноним ")) {
+                        isLocked = false;
+                        srvAuditJournal.addThreadActivityToLog(userDetails.getUsername(),userrole,thread_id.toString(),3);
+                    }
+                }
+            }
+            if (new_reply != null && !isCap && !isLocked) {
                 String addr="";
                 if(cookie!=null) {
                     for(Cookie cookie1:cookie) {
@@ -166,9 +186,15 @@ public class serviceReplies {
                             new_repliers.clear();
                         }
                     }
+                    new_reply.setReceiver_list(receiverlist);
                 }
                 new_reply.setRepliers(objectMapper.writeValueAsString(new ArrayList<String>()));
-                new_reply.setText(textFormat(new_reply.getText()));
+                new_reply.setText(textFormat(new_reply.getText(), bord.getName()));
+                if(!new_reply.getPostername().equals("false")) {
+                    new_reply.setPostername(parseUserRole(userDetails));
+                }else{
+                    new_reply.setPostername("Аноним ");
+                }
                 rReplies.save(new_reply);
                 if(attached_files!=null){
                     List<String> imgpath=new ArrayList<>();
@@ -199,6 +225,7 @@ public class serviceReplies {
                         entPostfiles postfile=new entPostfiles(null,filepaths,filepaths.substring(filepaths.indexOf('.')),new_reply);
                         srvPostfiles.addPostfile(postfile);
                     }
+                    new_reply.setImg_paths(imgpath);
                 }
                 return new_reply;
             }
@@ -258,7 +285,7 @@ public class serviceReplies {
         }
     }
 
-    private String textFormat(String text){
+    private String textFormat(String text,String bordshortname){
         Document.OutputSettings settings=new Document.OutputSettings().prettyPrint(false);
         text=Jsoup.clean(text,"", text_format_safelist,settings);
         if(text.contains("&gt;")){
@@ -285,6 +312,39 @@ public class serviceReplies {
             strongTag.tagName("span");
             strongTag.addClass("txt-cursive");
         }
-        return doc.body().html();
+        String str_ret=doc.body().html();
+        String af_bordname=bordshortname.substring(bordshortname.indexOf('/')+1);
+        if(srvAFT.getBordTextAutoFormatState(af_bordname)){
+            List<String> patterns=srvAFT.getBordTextAutoFormatList(af_bordname);
+            if(patterns!=null){
+                    for (String pattern:patterns) {
+                        str_ret = str_ret.replace(pattern.substring(0, pattern.indexOf('|')), "<span class=\"txt-replaced\">" + pattern.substring(pattern.indexOf('|') + 1) + "</span>");
+                    }
+                }
+        }
+        return str_ret;
+    }
+
+    private String parseUserRole(UserDetails userDetails) {
+        String role =userDetails!=null ? userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse(null) : "";
+            switch (Objects.requireNonNull(role)) {
+                case "ROLE_MAINADMIN" -> {
+                    role = "<span class=\"poster-name-madmin\">Главный врач </span>";
+                    return role;
+                }
+                case "ROLE_ADMIN" -> {
+                    role = "<span class=\"poster-name-admin\">Врач </span>";
+                    return role;
+                }
+                case "ROLE_MODERATOR" -> {
+                    role = "<span class=\"poster-name-moderator\">Санитар </span>";
+                    return role;
+                }
+            }
+        role = "Аноним ";
+        return role;
     }
 }
