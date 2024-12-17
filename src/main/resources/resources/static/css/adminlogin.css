@@ -1,0 +1,18 @@
+body{
+    background: #272626;
+    color: #48ff00;
+    font-family: system-ui;
+    font-weight: 300;
+}
+button{
+    background: black;
+    color: #00ffea;
+    width: 100px;
+    height: 30px;
+}
+p{
+    margin:2px;
+}
+.loginform{
+    text-align: center;
+}

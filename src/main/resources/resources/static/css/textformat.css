@@ -1,0 +1,20 @@
+.txt-strike{
+    text-decoration: line-through;
+}
+.txt-strong{
+    font-weight: bold;
+}
+.txt-cursive{
+    font-style: italic;
+}
+.txt-spoiler{
+    background: #a58d0f;
+    color: #a58d0f;
+}
+.txt-spoiler:hover{
+    background: inherit;
+    color: inherit;
+}
+.txt-greentext{
+    color: #88c712;
+}

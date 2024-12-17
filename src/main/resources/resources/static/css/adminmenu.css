@@ -1,0 +1,53 @@
+body{
+    background: #272626;
+    color: #48ff00;
+    font-family: system-ui;
+    font-weight: 300;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+}
+button{
+    background: black;
+    color: #00ffea;
+    width: 180px;
+    height: 35px;
+}
+.head-title{
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+    margin: 20px;
+}
+.docbody{
+    display:flex;
+    justify-content: space-between;
+}
+.info-zone{
+    width: 30%;
+    overflow-y: auto;
+    height: 800px;
+}
+.inputform{
+    width: 180px;
+}
+.input-and-button{
+    width:180px;
+}
+.underpage-content{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    border-top-style: solid;
+    border-color: #68c523;
+    flex-direction: column;
+    color: #efefef;
+    margin-top:auto;
+}
+.underpage-content a{
+    color: #00ffde;
+    font-weight: inherit;
+}
+.underpage-content a:hover{
+    font-weight: bold;
+}

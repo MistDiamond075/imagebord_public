@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Admin menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="icon" type="image" th:href="@{/files/favicon.png}">
+    <link rel="stylesheet nofollow" th:href="${cssfiles}+'/adminmenu.css'">
+    <script th:src="${jsfiles}+'/main.js'"></script>
+</head>
+<body>
+<div class="head-title">
+    Меню администратора
+</div>
+<div style="display:flex;flex-direction: column">
+    <button type="button" onclick="Logout()" style="align-self: flex-end">Выйти из аккаунта</button>
+</div>
+<br>
+<div class="docbody">
+<div class="menu">
+    <div>
+        <span>Управление постами</span>
+        <br>
+    <p class="input-and-button">
+        <button type="button" onclick="getReply()">Посмотреть пост</button>
+        <br>
+        <input id="get-reply-id" type="text" placeholder="ID поста...">
+    </p>
+        <p class="input-and-button">
+            <button type="button" onclick="getRepliesByThreadId()">Посмотреть посты в треде</button>
+            <br>
+            <input id="get-replies-by-thread" type="text" placeholder="ID треда...">
+        </p>
+        <p class="input-and-button">
+            <button type="button" onclick="delReply()">Удалить пост</button>
+            <br>
+            <input id="del-reply-id" type="text" placeholder="ID поста..." required>
+        </p>
+    </div>
+    <div>
+        <span>Управление тредами</span>
+        <br>
+    <p class="input-and-button">
+        <button type="button" onclick="getThread()">Посмотреть тред</button>
+    <br>
+        <input id="get-thread-id" type="text" placeholder="ID треда...">
+    </p>
+        <p class="input-and-button">
+            <button type="button" onclick="delThread()">Удалить тред</button>
+            <br>
+            <input id="del-thread-id" type="text" placeholder="ID треда..." required>
+        </p>
+        <p class="input-and-button">
+            <button type="button" onclick="pinThread()">Закрепить тред</button>
+            <br>
+            <input id="pin-thread-id" type="text" placeholder="ID треда..." required>
+        </p>
+        <p class="input-and-button">
+            <button type="button" onclick="lockThread()">Закрыть тред</button>
+            <br>
+            <input id="lock-thread-id" type="text" placeholder="ID треда..." required>
+        </p>
+    </div>
+    <div>
+        <span>Управление пользователями</span>
+        <br>
+        <p>
+            <button type="button" onclick="getBanlist()">Посмотреть баны</button>
+        </p>
+    <p>
+        <button type="button" onclick="FormsMenuDisplaySwitch('ban')">Забанить пользователя</button>
+    </p>
+    <p>
+        <button type="button" onclick="FormsMenuDisplaySwitch('user')">Добавить администратора</button>
+    </p>
+    </div>
+    <div>
+        <span>Управление репортами</span>
+        <br>
+    <p>
+    <div class="">
+        <button type="button" onclick="FormsMenuDisplaySwitch('report')">Репорты</button>
+        <div id="report_admin_menu" style="display: none;border-style: solid;border-top-style: none;border-color: #b7f5f5;width:fit-content">
+            <p><button type="button" onclick="getReports()">Посмотреть все репорты</button></p>
+            <p><button type="button" onclick="getReports(&quot;WAIT&quot;)">Посмотреть не обработанные репорты</button></p>
+            <p><button type="button" onclick="getReports(&quot;DONE&quot;)">Посмотреть законченные репорты</button></p>
+            <p><button type="button" onclick="getReports(&quot;IN_PROCESS&quot;)">Посмотреть обрабатываемые репорты</button></p>
+            <p class="input-and-button">
+                <form id="report_form">
+                <button type="submit" onclick="updReport()">Отметить репорт</button>
+                <br>
+            <input id="report_id_update_form" type="text" name="reportid" placeholder="ID репорта..." required>
+                <br>
+            <select id="report_status_update_form" name="reportstatus" required>
+                <option value="IN_PROCESS">На рассмотрении</option>
+                <option value="DONE">Обработан</option>
+            </select>
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        </form>
+            </p>
+        </div>
+    </div>
+    </p>
+    </div>
+    <div>
+        <span>Управление досками</span>
+        <br>
+    <p>
+        <button type="button" onclick="FormsMenuDisplaySwitch('bord')">Добавить доску</button>
+    </p>
+        <p class="input-and-button">
+            <button type="button" onclick="getBords()">Посмотреть доски</button>
+            <br>
+            <input id="get-bord-by-id" type="text" placeholder="ID доски..." required>
+        </p>
+    </div>
+    <div>
+        <span>Журнал аудита</span>
+        <br>
+        <p><button type="button" onclick="getAuditJournal()">Посмотреть журнал</button></p>
+    </div>
+    <div>
+        <span>Автозамена текста</span>
+        <br>
+        <p class="input-and-button">
+            <button type="button" onclick="getTextAutoFormatList()">Посмотреть список</button>
+            <br>
+            <select id="bordaft" name="aftbord" required th:field="*{bords}" style="width: inherit">
+                <option th:each="bord : ${bords}"
+                        th:field="*{bords}"
+                        th:value="${bord.name}"
+                        th:text="${bord.name}">Part name</option>
+            </select>
+        </p>
+        <p><button type="button" onclick="FormsMenuDisplaySwitch('aft')">Изменить список</button></p>
+        <p class="input-and-button">
+            <button type="button" onclick="changeTextAutoFormatState()">Настроить автозамену</button>
+            <br>
+            <select id="bordaftupdstate" name="aftbord" required th:field="*{bords}" style="width: inherit">
+                <option th:each="bord : ${bords}"
+                        th:field="*{bords}"
+                        th:value="${bord.name}"
+                        th:text="${bord.name}">Part name</option>
+            </select>
+            <br>
+            <select id="stateaft" required style="width: inherit">
+                <option value="true">Включить</option>
+                <option value="false">Выключить</option>
+            </select>
+        </p>
+    </div>
+</div>
+    <div class="inputform" style="display:none" id="formuser">
+        <p><span>Данные нового пользователя</span></p>
+        <form id="user_form">
+            <p><input type="text" name="username" placeholder="Логин..." required></p>
+            <p><input type="text" name="password" placeholder="Пароль..." required></p>
+            <p><select id="role" name="role" required>
+                <option value="ROLE_ADMIN">Администратор</option>
+                <option value="ROLE_MODERATOR">Модератор</option>
+            </select></p>
+            <p><button id="user_form_button" name="userbtn" type="submit" onclick="">Добавить</button></p>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        </form>
+
+    </div>
+    <div class="inputform" style="display:none" id="formbord">
+        <p><span>Создание новой доски</span></p>
+        <form id="bord_form">
+            <p><input type="text" name="bordshortname" placeholder="Короткое название (/{name})..." required></p>
+            <p><input type="text" name="bordfullname" placeholder="Полное название..." required></p>
+            <p><textarea cols="20" rows="30" name="borddesc" placeholder="Описание..." required style="height: 80px;width: 170px;resize: none"></textarea></p>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+            <p><button id="bord_form_button" name="bordbtn" type="submit">Добавить</button></p>
+        </form>
+
+    </div>
+    <div class="inputform" style="display:none" id="formban">
+        <p><span>Данные пользователя</span></p>
+        <form id="ban_form">
+        <p><input type="text" name="ip" placeholder="Ip-адрес..." required></p>
+         <p><input type="text" name="cause" placeholder="Причина..." required></p>
+        <p><input type="date" name="period"></p>
+        <p><button id="ban_form_button" name="banbtn" type="submit" onclick="">Забанить</button></p>
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        </form>
+    </div>
+    <div class="inputform" style="display:none;width:220px;font-size: 15px" id="formaft">
+        <p><span>Список автозамены</span></p>
+        <p><span>Одно слово - одна строка. Список должен выглядеть так: заменяемое_слово|замена_слова</span></p>
+        <form id="aft_form">
+            <p>
+                <textarea cols="20" rows="30" name="aftlist" id="aft_txtzone" placeholder="хорошо|плохо" required style="height: 80px;width: 170px;resize: none"></textarea>
+                <br>
+                <select id="bordaftadd" name="aftbord" required th:field="*{bords}" style="width: inherit">
+                    <option th:each="bord : ${bords}"
+                            th:field="*{bords}"
+                            th:value="${bord.name}"
+                            th:text="${bord.name}">Part name</option>
+                </select>
+            </p>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+            <p><button id="aft_form_button_get" name="bordbtn" type="button" onclick="getTextAutoFormatListForForm()">Загрузить текущий</button></p>
+            <p><button id="aft_form_button" name="bordbtn" type="button" onclick="addTextAutoFormatList()">Добавить</button></p>
+        </form>
+    </div>
+
+    <script th:src="${jsfiles}+'/adminmenu.js'"></script>
+    <div class="info-zone" id="getter_info">
+        information from server
+    </div>
+</div>
+
+<div class="underpage-content">
+    work in progress...
+    <br>
+    <span>
+        Содержимое сайта предназначено для 18+ пользователей. Администрация сайта не несёт ответственности за размещаемый контент.
+        За размещённую информацию личную ответственность несёт лицо, разместившее эту информацию на странице. Все права и копирайты принадлежат правообладателям.
+        Все сообщения принадлежат отправителям. Посмотреть <a href="/rules">правила</a> можно <a href="/rules">здесь</a>. Правила для привилегированных пользователей
+        <a href="adminrules">здесь</a>
+    </span>
+</div>
+</body>
+</html>
