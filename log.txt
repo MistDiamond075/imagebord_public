@@ -1,0 +1,27 @@
+nohup: ignoring input
+
+7-Zip (r) 23.01 (arm64) : Igor Pavlov : Public domain : 2023-06-20
+ 64-bit arm_v:8 locale=ru_RU.UTF-8 Threads:4 OPEN_MAX:1024
+
+Compiler: 13.2.0 GCC 13.2.0
+Linux : 6.6.44-current-sunxi64 : #1 SMP Sat Aug  3 06:54:42 UTC 2024 : aarch64
+PageSize:4KB THP:madvise hwcap:8FF:CRC32:SHA1:SHA2:AES:ASIMD
+LE 
+
+1T CPU Freq (MHz):   597   718  1508  1510  1509  1509  1509
+2T CPU Freq (MHz): 199% 1508   200% 1507  
+
+RAM size:    3932 MB,  # CPU hardware threads:   4
+RAM usage:    889 MB,  # Benchmark threads:      4
+
+                       Compressing  |                  Decompressing
+Dict     Speed Usage    R/U Rating  |      Speed Usage    R/U Rating
+         KiB/s     %   MIPS   MIPS  |      KiB/s     %   MIPS   MIPS
+
+22:       2927   347    821   2848  |      66818   383   1486   5700
+23:       2830   356    810   2884  |      65349   384   1473   5655
+24:       2742   365    808   2949  |      62744   378   1456   5506
+25:       2624   370    810   2996  |      61846   384   1434   5504
+----------------------------------  | ------------------------------
+Avr:      2781   359    812   2919  |      64190   382   1462   5591
+Tot:             371   1137   4255
